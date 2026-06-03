@@ -116,6 +116,9 @@ Write-Host "  GitHub Copilot  ->  $CopilotOut" -ForegroundColor Green
 Write-Host ""
 Write-Host "Done. All configs generated." -ForegroundColor Cyan
 Write-Host ""
+Write-Host "Did you calibrate a prompt? Log it:" -ForegroundColor Yellow
+Write-Host "  notepad $ScriptDir\CHANGELOG.md"
+Write-Host ""
 Write-Host "Tip: create a shortcut for your project so you don't have to type the path each time:" -ForegroundColor Yellow
 Write-Host "  Add this to your PowerShell profile (notepad `$PROFILE):"
 Write-Host "  function build-ai { C:\Users\$env:USERNAME\ai-config\build.ps1 -ProjectRoot `"C:\path\to\your\project`" }"
