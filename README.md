@@ -13,11 +13,6 @@ ai-config/
 │   ├── qa-engineer.md
 │   └── code-reviewer.md
 │
-├── tools/                   ← Tool-specific headers/wrappers
-│   ├── claude\wrapper.md    ← Claude Code preamble
-│   ├── windsurf\wrapper.md  ← Windsurf Cascade preamble
-│   └── copilot\wrapper.md   ← GitHub Copilot preamble
-│
 ├── eval/                    ← Testing your prompt quality
 │   ├── evaluator-prompt.md  ← Paste into Claude to score an agent
 │   └── benchmark-tasks.md   ← Known tasks to run agents against
@@ -26,12 +21,20 @@ ai-config/
 └── README.md                ← This file
 ```
 
-## How to Use
+## Generated output (do not edit manually)
+
+| Source | Claude Code | Windsurf | GitHub Copilot |
+|---|---|---|---|
+| `agents\backend-developer.md` | `.claude\commands\backend-developer.md` | `.windsurf\rules\backend-developer.md` | `.github\agents\backend-developer.agent.md` |
+
+Same pattern for every agent file.
+
+## How to use
 
 ### Make a change
 1. Edit any file in `agents\`
 2. Run `.\build.ps1`
-3. Done — all three tools are updated
+3. Done — all three tools updated
 
 ### Change where your project is
 ```powershell
@@ -43,14 +46,14 @@ ai-config/
 Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
 ```
 
-### Test prompt quality
+### Invoke an agent
+- **Claude Code:** type `/backend-developer` in the chat
+- **Windsurf:** say "use the backend-developer agent" or reference it in your prompt
+- **Copilot:** type `/agent` and select from the list
+
+## Test prompt quality
 1. Open `eval\benchmark-tasks.md` — pick a task
-2. Run it against the relevant agent in your tool of choice
+2. Run it against the relevant agent
 3. Open `eval\evaluator-prompt.md` — paste into a fresh Claude chat with the output
 4. Improve the agent file based on the feedback
 5. Re-run `.\build.ps1`
-
-## Generated files (do not edit manually)
-- `.claude\CLAUDE.md`
-- `.windsurf\rules\*.md`
-- `.github\copilot-instructions.md`

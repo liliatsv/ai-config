@@ -11,49 +11,40 @@ param(
 
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $AgentsDir = Join-Path $ScriptDir "agents"
-$ToolsDir  = Join-Path $ScriptDir "tools"
 
-$ClaudeDest   = Join-Path $ProjectRoot ".claude\CLAUDE.md"
-$WindsurfDest = Join-Path $ProjectRoot ".windsurf\rules"
-$CopilotDest  = Join-Path $ProjectRoot ".github\copilot-instructions.md"
+$ClaudeCommandsDest = Join-Path $ProjectRoot ".claude\commands"
+$WindsurfDest       = Join-Path $ProjectRoot ".windsurf\rules"
+$CopilotAgentsDest  = Join-Path $ProjectRoot ".github\agents"
 
 Write-Host "Building AI tool configs from source..." -ForegroundColor Cyan
 Write-Host "   Project root: $ProjectRoot"
 Write-Host ""
 
-# ---- 1. Claude Code → .claude\CLAUDE.md ----
-New-Item -ItemType Directory -Force -Path (Split-Path $ClaudeDest) | Out-Null
-Get-Content (Join-Path $ToolsDir "claude\wrapper.md") | Set-Content $ClaudeDest
+# ---- 1. Claude Code → .claude\commands\<agent>.md ----
+New-Item -ItemType Directory -Force -Path $ClaudeCommandsDest | Out-Null
 foreach ($agent in Get-ChildItem "$AgentsDir\*.md") {
-    Add-Content $ClaudeDest ""
-    Add-Content $ClaudeDest "---"
-    Add-Content $ClaudeDest ""
-    Get-Content $agent.FullName | Add-Content $ClaudeDest
+    Copy-Item $agent.FullName (Join-Path $ClaudeCommandsDest $agent.Name) -Force
 }
-Write-Host "✅ Claude Code   → $ClaudeDest" -ForegroundColor Green
+Write-Host "✅ Claude Code   → $ClaudeCommandsDest\" -ForegroundColor Green
 
-# ---- 2. Windsurf Cascade → .windsurf\rules\*.md ----
+# ---- 2. Windsurf Cascade → .windsurf\rules\<agent>.md ----
 New-Item -ItemType Directory -Force -Path $WindsurfDest | Out-Null
-Copy-Item (Join-Path $ToolsDir "windsurf\wrapper.md") (Join-Path $WindsurfDest "00-base.md") -Force
 foreach ($agent in Get-ChildItem "$AgentsDir\*.md") {
     Copy-Item $agent.FullName (Join-Path $WindsurfDest $agent.Name) -Force
 }
 Write-Host "✅ Windsurf       → $WindsurfDest\" -ForegroundColor Green
 
-# ---- 3. GitHub Copilot → .github\copilot-instructions.md ----
-New-Item -ItemType Directory -Force -Path (Split-Path $CopilotDest) | Out-Null
-Get-Content (Join-Path $ToolsDir "copilot\wrapper.md") | Set-Content $CopilotDest
+# ---- 3. GitHub Copilot → .github\agents\<agent>.agent.md ----
+New-Item -ItemType Directory -Force -Path $CopilotAgentsDest | Out-Null
 foreach ($agent in Get-ChildItem "$AgentsDir\*.md") {
-    Add-Content $CopilotDest ""
-    Add-Content $CopilotDest "---"
-    Add-Content $CopilotDest ""
-    Get-Content $agent.FullName | Add-Content $CopilotDest
+    $agentName = $agent.BaseName + ".agent.md"
+    Copy-Item $agent.FullName (Join-Path $CopilotAgentsDest $agentName) -Force
 }
-Write-Host "✅ GitHub Copilot → $CopilotDest" -ForegroundColor Green
+Write-Host "✅ GitHub Copilot → $CopilotAgentsDest\" -ForegroundColor Green
 
 Write-Host ""
 Write-Host "Done. All configs updated." -ForegroundColor Cyan
-Write-Host "   Edit agents\*.md or tools\*\wrapper.md, then re-run this script."
+Write-Host "   Edit agents\*.md, then re-run this script."
 Write-Host ""
 Write-Host "Did you calibrate a prompt? Log it:" -ForegroundColor Yellow
 Write-Host "  notepad $ScriptDir\CHANGELOG.md"
