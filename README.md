@@ -1,53 +1,56 @@
 # AI Config — Single Source of Truth
 
-This folder is the **source of truth** for all AI tool configurations.
-Never edit `.claude/`, `.windsurf/`, or `.github/copilot-instructions.md` directly —
-edit here and run `build.sh`.
+All AI tool configurations live here. Never edit the generated files directly.
 
 ## Structure
 
 ```
 ai-config/
-├── agents/                  ← one file per agent role (edit these)
+├── agents/                  ← EDIT THESE (one file per agent role)
 │   ├── project-manager.md
 │   ├── backend-developer.md
 │   ├── db-specialist.md
-│   ├── qa.md
+│   ├── qa-engineer.md
 │   └── code-reviewer.md
-├── rules/
-│   └── shared.md            ← rules applied to ALL tools and agents
-├── build.sh                 ← generates configs for all tools
-└── README.md
+│
+├── tools/                   ← Tool-specific headers/wrappers
+│   ├── claude\wrapper.md    ← Claude Code preamble
+│   ├── windsurf\wrapper.md  ← Windsurf Cascade preamble
+│   └── copilot\wrapper.md   ← GitHub Copilot preamble
+│
+├── eval/                    ← Testing your prompt quality
+│   ├── evaluator-prompt.md  ← Paste into Claude to score an agent
+│   └── benchmark-tasks.md   ← Known tasks to run agents against
+│
+├── build.ps1                ← Run this after any edit
+└── README.md                ← This file
 ```
 
-## Usage
+## How to Use
 
-```bash
-# From the ai-config directory:
-./build.sh /path/to/your/spring-boot-project
+### Make a change
+1. Edit any file in `agents\`
+2. Run `.\build.ps1`
+3. Done — all three tools are updated
 
-# Or from project root (if ai-config is inside the project):
-./ai-config/build.sh .
+### Change where your project is
+```powershell
+.\build.ps1 -ProjectRoot "C:\path\to\your\springboot-project"
 ```
 
-## What gets generated
+### First-time setup (if PowerShell blocks scripts)
+```powershell
+Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
+```
 
-| Tool            | Output location                        | Notes                              |
-|-----------------|----------------------------------------|------------------------------------|
-| Claude Code     | `.claude/CLAUDE.md`                    | All agents + shared rules          |
-| Windsurf        | `.windsurf/rules/`                     | One file per agent                 |
-| GitHub Copilot  | `.github/copilot-instructions.md`      | Condensed — Copilot is inline only |
+### Test prompt quality
+1. Open `eval\benchmark-tasks.md` — pick a task
+2. Run it against the relevant agent in your tool of choice
+3. Open `eval\evaluator-prompt.md` — paste into a fresh Claude chat with the output
+4. Improve the agent file based on the feedback
+5. Re-run `.\build.ps1`
 
-## When to run build.sh
-
-Run it whenever you change any file in `agents/` or `rules/`.
-Optionally install as a git pre-commit hook — instructions printed at end of build.sh.
-
-## Prompt Quality Tips
-
-1. **Benchmark tasks**: keep 5–10 tasks with known correct answers. Re-run them after prompt changes.
-2. **Evaluator prompt**: paste agent prompt + task + output into a separate Claude chat and ask it to score correctness, completeness, and hallucinations on 1–5.
-3. **Proxy metrics to track manually**:
-   - Number of correction messages before a usable result
-   - Did it touch the right files on the first try? (Y/N)
-   - Did you copy-paste the output directly, or rewrite it? 
+## Generated files (do not edit manually)
+- `.claude\CLAUDE.md`
+- `.windsurf\rules\*.md`
+- `.github\copilot-instructions.md`
